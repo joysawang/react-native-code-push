@@ -8,43 +8,45 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Button } from 'react-native-elements';
+import codePush from 'react-native-code-push';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
+const deploymentKeys = {
+  staging: "hkTaCsZqlgm6imARNczJog_Qc-3jHy1ZHE-LE",
+  production: "mlBRrx2aGJHUvIfLJpTUeFEbadrzHJxGBNbUV"
+}
 
-type Props = {};
-export default class App extends Component<Props> {
+class App extends Component<Props> {
+  checkUpdates() {
+    codePush.sync({
+      deploymentKey: (__DEV__) ? deploymentKeys.staging : deploymentKeys.production,
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE
+    });
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
+      <ScrollView>
+        <Text style={{margin: 10, fontSize: 16, fontWeight: 'bold'}}>Logs Application</Text>
+        <View style={{marginLeft: 10, marginRight: 10, paddingTop: 10, paddingBottom: 10, borderBottomWidth: 0.75, borderBottomColor: 'rgba(0, 0, 0, 0.5)'}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold'}}>Initial</Text>
+          <Text>Create React Native Application</Text>
+        </View>
+        {
+          // <View style={{marginLeft: 10, marginRight: 10, paddingTop: 10, paddingBottom: 10, borderBottomWidth: 0.75, borderBottomColor: 'rgba(0, 0, 0, 0.5)'}}>
+          //   <Text style={{fontSize: 16, fontWeight: 'bold'}}>Update</Text>
+          //   <Text>Test update react native by code push</Text>
+          // </View>
+        }
+        <View style={{margin: 10}}>
+          <Button onPress={this.checkUpdates.bind(this)} title="Check for Updates" />
+        </View>
+      </ScrollView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+export default codePush(codePushOptions)(App);
